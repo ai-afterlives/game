@@ -200,8 +200,6 @@ function typeWriter(text, i = 0) {
     typing = false;
   }
 }
-
-// ===== Show Scene Logic =====
 function showScene(sceneKey) {
   clearTimeout(typingTimeout);
   typing = false;
@@ -211,12 +209,16 @@ function showScene(sceneKey) {
   storyElement.textContent = '';
   choicesElement.innerHTML = '';
 
-  // Wait for image fully loaded before typing
-  storyImage.onload = () => typeWriter(scene.text);
-  storyImage.src = scene.image;
-
-  if (storyImage.complete) {
+  const img = preloadedImages[scene.image];
+  
+  if (img && img.complete) {
+    // Image already loaded in memory
+    storyImage.src = scene.image;
     typeWriter(scene.text);
+  } else {
+    // Load and wait for image
+    storyImage.onload = () => typeWriter(scene.text);
+    storyImage.src = scene.image;
   }
 
   scene.choices.forEach(choice => {
