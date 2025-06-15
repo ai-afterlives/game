@@ -166,9 +166,19 @@ function showScene(sceneKey) {
   const scene = story[sceneKey];
   storyElement.textContent = '';
   choicesElement.innerHTML = '';
+  
+  const img = new Image();
+  img.src = scene.image;
 
+  img.onload = () => {
   storyImage.src = scene.image;
   typeWriter(scene.text);
+  };
+img.onerror = () => {
+    console.error("Image failed to load: " + scene.image);
+    storyImage.src = ''; 
+    typeWriter(scene.text);
+  };
 
   scene.choices.forEach(choice => {
     const button = document.createElement('button');
