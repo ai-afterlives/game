@@ -15,8 +15,12 @@ enterButton.addEventListener('click', () => {
   soundEnabled = true;
   openingScreen.style.display = 'none';
   gameScreen.style.display = 'block';
-  showScene('start');
+
+  preloadImages(() => {
+    showScene('start');
+  });
 });
+
 const imagePaths = [
   "images/eluned_portrait.png",
   "images/ElunedCatrin.png",
