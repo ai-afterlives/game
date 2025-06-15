@@ -1,3 +1,28 @@
+const imagePaths = [
+  "images/eluned_portrait.png",
+  "images/ElunedCatrin.png",
+  "images/book_cover.png",
+  "images/gallery1.png",
+  "images/gallery2.png",
+  "images/gallery3.png",
+  "images/gallery4.png",
+  "images/gallery5.png",
+  "images/gallery6.jpg",
+  "images/Eluned_Gwen.png",
+  "images/Stitching_Valleys.png",
+  "images/gallery7.png",
+  "images/gallery8.jpg",
+  "images/gallery9.png",
+  "images/Eluned2.png",
+  "images/mill2.png",
+  "images/mill1.png"
+];
+const preloadedImages = {};
+imagePaths.forEach(path => {
+  const img = new Image();
+  img.src = path;
+  preloadedImages[path] = img;
+});
 let typing = false;
 let typingTimeout = null;
 
@@ -20,26 +45,6 @@ enterButton.addEventListener('click', () => {
     showScene('start');
   });
 });
-
-const imagePaths = [
-  "images/eluned_portrait.png",
-  "images/ElunedCatrin.png",
-  "images/book_cover.png",
-  "images/gallery1.png",
-  "images/gallery2.png",
-  "images/gallery3.png",
-  "images/gallery4.png",
-  "images/gallery5.png",
-  "images/gallery6.jpg",
-  "images/Eluned_Gwen.png",
-  "images/Stitching_Valleys.png",
-  "images/gallery7.png",
-  "images/gallery8.jpg",
-  "images/gallery9.png",
-  "images/Eluned2.png",
-  "images/mill2.png",
-  "images/mill1.png"
-];
 const story = {
   start: {
     text: "You are the curator at Historic Voices Museum, Wales. You’re tasked with developing the AI Afterlife prototype for Eluned Caradog. Where do you begin?",
@@ -211,9 +216,15 @@ function showScene(sceneKey) {
   const scene = story[sceneKey];
   storyElement.textContent = '';
   choicesElement.innerHTML = '';
-  
+  // First, set image src:
   storyImage.src = scene.image;
+
+  storyImage.onload = () => {
     typeWriter(scene.text);
+  }
+  if (storyImage.complete) {
+    typeWriter(scene.text);
+  }
 
   scene.choices.forEach(choice => {
     const button = document.createElement('button');
