@@ -17,6 +17,7 @@ const imagePaths = [
   "images/mill2.png",
   "images/mill1.png"
 ];
+
 let typing = false;
 let typingTimeout = null;
 
@@ -210,23 +211,19 @@ function showScene(sceneKey) {
   const scene = story[sceneKey];
   storyElement.textContent = '';
   choicesElement.innerHTML = '';
-  // First, set image src:
-  storyImage.src = scene.image;
+  
+  const img = preloadedImages[scene.image];
+      storyImage.src = img.src;
 
-  storyImage.onload = () => {
-    typeWriter(scene.text);
-  }
-  if (storyImage.complete) {
-    typeWriter(scene.text);
-  }
+      img.complete ? typeWriter(scene.text) : img.onload = () => typeWriter(scene.text);
 
-  scene.choices.forEach(choice => {
-    const button = document.createElement('button');
-    button.textContent = choice.text;
-    button.onclick = () => {
-      soundEnabled = true;
-      showScene(choice.next);
-    };
-    choicesElement.appendChild(button);
-  });
-}
+      scene.choices.forEach(choice => {
+        const button = document.createElement('button');
+        button.textContent = choice.text;
+        button.onclick = () => {
+          soundEnabled = true;
+          showScene(choice.next);
+        };
+        choicesElement.appendChild(button);
+      });
+    }
