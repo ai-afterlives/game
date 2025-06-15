@@ -17,12 +17,6 @@ const imagePaths = [
   "images/mill2.png",
   "images/mill1.png"
 ];
-const preloadedImages = {};
-imagePaths.forEach(path => {
-  const img = new Image();
-  img.src = path;
-  preloadedImages[path] = img;
-});
 let typing = false;
 let typingTimeout = null;
 
@@ -193,7 +187,7 @@ function preloadImages(callback) {
       preloadedImages[path] = img;
       loaded++;
       if (loaded === imagePaths.length) {
-        callback(); // Start game when all images loaded
+        callback();
       }
     };
     img.onerror = () => {
