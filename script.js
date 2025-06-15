@@ -17,7 +17,25 @@ enterButton.addEventListener('click', () => {
   gameScreen.style.display = 'block';
   showScene('start');
 });
-
+const imagePaths = [
+  "images/eluned_portrait.png",
+  "images/ElunedCatrin.png",
+  "images/book_cover.png",
+  "images/gallery1.png",
+  "images/gallery2.png",
+  "images/gallery3.png",
+  "images/gallery4.png",
+  "images/gallery5.png",
+  "images/gallery6.jpg",
+  "images/Eluned_Gwen.png",
+  "images/Stitching_Valleys.png",
+  "images/gallery7.png",
+  "images/gallery8.jpg",
+  "images/gallery9.png",
+  "images/Eluned2.png",
+  "images/mill2.png",
+  "images/mill1.png"
+];
 const story = {
   start: {
     text: "You are the curator at Historic Voices Museum, Wales. You’re tasked with developing the AI Afterlife prototype for Eluned Caradog. Where do you begin?",
@@ -155,6 +173,29 @@ function typeWriter(text, i = 0) {
     typing = false;
   }
 }
+const preloadedImages = {};
+
+function preloadImages(callback) {
+  let loaded = 0;
+  imagePaths.forEach(path => {
+    const img = new Image();
+    img.src = path;
+    img.onload = () => {
+      preloadedImages[path] = img;
+      loaded++;
+      if (loaded === imagePaths.length) {
+        callback(); // Start game when all images loaded
+      }
+    };
+    img.onerror = () => {
+      console.error("Failed to preload: " + path);
+      loaded++;
+      if (loaded === imagePaths.length) {
+        callback();
+      }
+    };
+  });
+}
 
 function showScene(sceneKey) {
   if (typing) {
@@ -167,18 +208,8 @@ function showScene(sceneKey) {
   storyElement.textContent = '';
   choicesElement.innerHTML = '';
   
-  const img = new Image();
-  img.src = scene.image;
-
-  img.onload = () => {
   storyImage.src = scene.image;
-  typeWriter(scene.text);
-  };
-img.onerror = () => {
-    console.error("Image failed to load: " + scene.image);
-    storyImage.src = ''; 
     typeWriter(scene.text);
-  };
 
   scene.choices.forEach(choice => {
     const button = document.createElement('button');
