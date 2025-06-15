@@ -1,3 +1,4 @@
+// ===== Preload Images =====
 const imagePaths = [
   "images/eluned_portrait.png",
   "images/ElunedCatrin.png",
@@ -14,12 +15,35 @@ const imagePaths = [
   "images/gallery8.jpg",
   "images/gallery9.png",
   "images/Eluned2.png",
-  "images/mill2.png",
-  "images/mill1.png"
+  "images/mill2.jpg",
+  "images/mill1.jpg"
 ];
 
+const preloadedImages = {};
+let imagesLoaded = 0;
+
+// Preload function
+function preloadImages(callback) {
+  imagePaths.forEach(path => {
+    const img = new Image();
+    img.src = path;
+    img.onload = () => {
+      preloadedImages[path] = img;
+      imagesLoaded++;
+      if (imagesLoaded === imagePaths.length) callback();
+    };
+    img.onerror = () => {
+      console.error("Failed to preload: " + path);
+      imagesLoaded++;
+      if (imagesLoaded === imagePaths.length) callback();
+    };
+  });
+}
+
+// ===== Game Variables =====
 let typing = false;
 let typingTimeout = null;
+let soundEnabled = false;
 
 const openingScreen = document.getElementById('opening');
 const enterButton = document.getElementById('enter-button');
@@ -29,17 +53,15 @@ const choicesElement = document.getElementById('choices');
 const storyImage = document.getElementById('story-image');
 const typeSound = document.getElementById('type-sound');
 
-let soundEnabled = false;
-
+// ===== Event: Start Button =====
 enterButton.addEventListener('click', () => {
   soundEnabled = true;
   openingScreen.style.display = 'none';
   gameScreen.style.display = 'block';
-
-  preloadImages(() => {
-    showScene('start');
-  });
+  preloadImages(() => showScene('start'));
 });
+
+// ===== Story Data =====
 const story = {
   start: {
     text: "You are the curator at Historic Voices Museum, Wales. You’re tasked with developing the AI Afterlife prototype for Eluned Caradog. Where do you begin?",
@@ -163,6 +185,7 @@ const story = {
   }
 };
 
+// ===== Typewriter =====
 function typeWriter(text, i = 0) {
   if (i === 0 && soundEnabled) {
     typeSound.currentTime = 0;
@@ -177,53 +200,32 @@ function typeWriter(text, i = 0) {
     typing = false;
   }
 }
-const preloadedImages = {};
 
-function preloadImages(callback) {
-  let loaded = 0;
-  imagePaths.forEach(path => {
-    const img = new Image();
-    img.src = path;
-    img.onload = () => {
-      preloadedImages[path] = img;
-      loaded++;
-      if (loaded === imagePaths.length) {
-        callback();
-      }
-    };
-    img.onerror = () => {
-      console.error("Failed to preload: " + path);
-      loaded++;
-      if (loaded === imagePaths.length) {
-        callback();
-      }
-    };
-  });
-}
-
+// ===== Show Scene Logic =====
 function showScene(sceneKey) {
-  if (typing) {
-    clearTimeout(typingTimeout);
-    typing = false;
-    typeSound.pause();
-  }
+  clearTimeout(typingTimeout);
+  typing = false;
+  typeSound.pause();
 
   const scene = story[sceneKey];
   storyElement.textContent = '';
   choicesElement.innerHTML = '';
-  
-  const img = preloadedImages[scene.image];
-      storyImage.src = img.src;
 
-      img.complete ? typeWriter(scene.text) : img.onload = () => typeWriter(scene.text);
+  // Wait for image fully loaded before typing
+  storyImage.onload = () => typeWriter(scene.text);
+  storyImage.src = scene.image;
 
-      scene.choices.forEach(choice => {
-        const button = document.createElement('button');
-        button.textContent = choice.text;
-        button.onclick = () => {
-          soundEnabled = true;
-          showScene(choice.next);
-        };
-        choicesElement.appendChild(button);
-      });
-    }
+  if (storyImage.complete) {
+    typeWriter(scene.text);
+  }
+
+  scene.choices.forEach(choice => {
+    const button = document.createElement('button');
+    button.textContent = choice.text;
+    button.onclick = () => {
+      soundEnabled = true;
+      showScene(choice.next);
+    };
+    choicesElement.appendChild(button);
+  });
+}
